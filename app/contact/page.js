@@ -26,14 +26,30 @@ export default function ContactPage() {
     return Object.keys(tempErrors).length === 0;
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     if (validate()) {
-      // Simulate API call
-      setTimeout(() => {
-        setIsSubmitted(true);
-        setFormData({ name: "", email: "", subject: "", message: "" });
-      }, 1000);
+      try {
+        const res = await fetch('/api/contact', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(formData),
+        });
+
+        const data = await res.json();
+
+        if (data.success) {
+          setIsSubmitted(true);
+          setFormData({ name: "", email: "", subject: "", message: "" });
+        } else {
+          setErrors({ ...errors, apiError: data.error || "Something went wrong" });
+        }
+      } catch (error) {
+        console.error("Submission error:", error);
+        setErrors({ ...errors, apiError: "Failed to send message. Please try again." });
+      }
     }
   };
 

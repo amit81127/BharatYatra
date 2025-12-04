@@ -11,7 +11,7 @@ export default function Hero() {
       <div className="absolute inset-0 z-0">
         <div className="absolute inset-0 bg-black/40 z-10" />
         <img
-          src="https://images.unsplash.com/photo-1524492412937-b28074a5d7da?q=80&w=2000&auto=format&fit=crop"
+          src="https://lh3.googleusercontent.com/gps-cs-s/AG0ilSzU6UYQ3Bl4Y9k9gC58jW_fu3Fr0o1Po5vWXjwkZx0kh0VReBDMiWbT_F_A7Un_3SrUX_PoglYZCGShSNc6QHBr83MVPewNRJ4tFMqW10THaRmv-XpGXrOmwRNhlLU7A89HRnG_SQ=s1360-w1360-h1020-rw"
           alt="Taj Mahal"
           className="w-full h-full object-cover"
         />

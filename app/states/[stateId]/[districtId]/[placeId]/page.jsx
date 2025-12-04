@@ -11,6 +11,9 @@ import ImageGallery from "@/components/ImageGallery";
 import Button from "@/components/ui/Button";
 import { MapPin, ChevronRight, Clock, Ticket, Info, Hotel, ArrowLeft } from "lucide-react";
 
+// ADD these imports
+import { Bike, Car, Bus, Train } from "lucide-react";
+
 export default function PlacePage() {
     const params = useParams();
     const [data, setData] = useState({ state: null, district: null, place: null });
@@ -88,6 +91,73 @@ export default function PlacePage() {
         const db = b.distanceFromPlaceKm ?? Infinity;
         return da - db;
     });
+
+    /**
+     * TransportOptions component
+     * - Shows per-km rates for bike/car/bus/train
+     * - If the place provides a distance (place.distanceFromNearestCityKm or place.distanceKm),
+     *   display an estimated total fare for each transport using the per-km rates.
+     */
+    const TransportOptions = ({ place }) => {
+        // per-km rates in INR (adjust to your preference or source)
+        const RATES = {
+            bike: 2,      // ₹2 per km
+            car: 10,      // ₹10 per km
+            bus: 1.5,     // ₹1.5 per km
+            train: 0.8,   // ₹0.8 per km
+        };
+
+        // Try a couple of commonly named distance fields; fallback to null if not present
+        const distanceKm = place.distanceFromNearestCityKm ?? place.distanceKm ?? null;
+
+        const formatPrice = (p) => {
+            if (p == null || Number.isNaN(p)) return "—";
+            return `₹${Math.round(p)}`;
+        };
+
+        const items = [
+            { key: "bike", label: "Bike", Icon: Bike, rate: RATES.bike },
+            { key: "car", label: "Car (Taxi)", Icon: Car, rate: RATES.car },
+            { key: "bus", label: "Bus", Icon: Bus, rate: RATES.bus },
+            { key: "train", label: "Train", Icon: Train, rate: RATES.train },
+        ];
+
+        return (
+            <div className="bg-white rounded-2xl p-4 border border-gray-100">
+                <h4 className="text-md font-semibold mb-3 text-gray-900">Estimated Travel Prices</h4>
+                <p className="text-sm text-gray-500 mb-4">
+                    Prices shown are estimates. Per-km rate is displayed, and total is calculated if distance is available.
+                </p>
+
+                <div className="grid grid-cols-2 gap-3">
+                    {items.map(({ key, label, Icon, rate }) => {
+                        const total = distanceKm ? (rate * Number(distanceKm)) : null;
+                        return (
+                            <div key={key} className="flex items-center gap-3 p-3 rounded-xl border border-gray-100">
+                                <div className="p-2 bg-primary/10 rounded-lg text-primary">
+                                    <Icon size={18} />
+                                </div>
+                                <div className="flex-1">
+                                    <div className="flex items-baseline justify-between">
+                                        <span className="text-sm font-medium text-gray-800">{label}</span>
+                                        <span className="text-sm text-gray-600">{formatPrice(total ?? rate)}{distanceKm ? "" : " (per km)"}</span>
+                                    </div>
+                                    <div className="text-xs text-gray-400">{distanceKm ? `${distanceKm} km @ ₹${rate}/km` : `₹${rate}/km`}</div>
+                                </div>
+                            </div>
+                        );
+                    })}
+                </div>
+
+                {/* If distance isn't available, provide a small tip */}
+                {!distanceKm && (
+                    <p className="text-xs text-gray-400 mt-3">
+                        Tip: add `distanceFromNearestCityKm` (number) to your place data to show total price estimates.
+                    </p>
+                )}
+            </div>
+        );
+    };
 
     return (
         <Layout>
@@ -195,6 +265,9 @@ export default function PlacePage() {
                                     </div>
                                 </div>
                             </div>
+
+                            {/* NEW: Transport options & pricing */}
+                            <TransportOptions place={place} />
 
                             <div className="pt-6 border-t border-gray-100">
                                 <a

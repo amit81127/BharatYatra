@@ -14,7 +14,7 @@ This is a Next.js application that serves as a travel guide for India, using a l
 2.  **Install Dependencies**:
     ```bash
     npm install
-    ```
+    
 
 3.  **Run Development Server**:
     ```bash
